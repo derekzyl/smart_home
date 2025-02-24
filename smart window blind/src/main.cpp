@@ -33,7 +33,7 @@ void setupAP();
 #define AP_PREFIX "SmartBlind_"
 #define STEPS_PER_REVOLUTION 4096  // For 28BYJ-48 stepper motor
 #define MAX_STEPS 20000  // Maximum steps (adjust based on your blind)
-
+IPAddress apIP(192, 168, 4, 1); 
 // Stepper motor sequence (half-step)
 const byte stepSequence[8] = {
   0b0001,  // Q1
@@ -366,7 +366,7 @@ String generateUniqueId() {
     if (mac[i] < 16) id += "0";
     id += String(mac[i], HEX);
   }
-  return id;
+  return "smartblind-001";
 }
 
 void setup() {
@@ -385,8 +385,8 @@ void setup() {
   // Load configuration if available
   loadConfiguration();
   
+  setupAP();
   if (!isConfigured) {
-    setupAP();
     server.on("/", HTTP_GET, handleRoot);
     server.on("/setup", HTTP_GET, handleSetup);
     server.on("/calibrate", HTTP_GET, handleCalibration);
@@ -398,6 +398,7 @@ void setup() {
 }
 void setupAP() {
   String apName = AP_PREFIX + deviceId.substring(0, 6);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   WiFi.softAP(apName.c_str(), deviceId.c_str());
   Serial.println("Access Point Started");
   Serial.print("SSID: ");
