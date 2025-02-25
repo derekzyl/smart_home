@@ -16,7 +16,7 @@
 # @app.get('/')
 # async def root():
 #     return JSONResponse(status_code=status.HTTP_200_OK, content = response_message(data="welcome to smart home", success_status=True, message="success"))
-
+#
 import asyncio
 import base64
 import json
