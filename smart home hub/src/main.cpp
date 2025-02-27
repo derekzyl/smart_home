@@ -27,6 +27,7 @@
  #define BUTTON2_PIN 27   // Button 2 connected to D27
  #define BUTTON3_PIN 25   // Button 3 connected to D25
  #define ALARM_PIN 23     // Alarm connected to D23
+ #define VOLTAGE_SENSOR_PIN 13  // Voltage sensor connected to D13
  
  // Constants
  #define EEPROM_SIZE 512
@@ -48,6 +49,7 @@
  bool alarmState = false;
  float temperature = 0;
  float humidity = 0;
+ float batteryPercentage = 0;
  unsigned long lastTempReadTime = 0;
  unsigned long lastHeartbeatTime = 0;
  String connectedDevices[MAX_DEVICES];
@@ -430,7 +432,7 @@
      Serial.println("Connecting to WebSocket server...");
      
      // Set server address and port - replace with your actual FastAPI server details
-     webSocket.begin("your-smart-home-server.com", 8080, "/ws/hub/" + uniqueId);
+     webSocket.begin("https://well-scallop-cybergenii-075601d4.koyeb.app", 8080, "/ws/hub/" + uniqueId);
      
      // Set event handler
      webSocket.onEvent(webSocketEvent);
@@ -861,6 +863,19 @@
   } else {
     Serial.println("Failed to read from DHT sensor!");
   }
+
+    // Read battery voltage from voltage sensor pin
+    int rawVoltage = analogRead(VOLTAGE_SENSOR_PIN);
+  
+    // Convert raw reading to actual voltage (adjust multiplier based on your voltage divider)
+    // Assuming ESP32 ADC (0-4095) maps to 0-3.3V and you have a voltage divider
+    float voltage = rawVoltage * (3.3 / 4095.0) * 2.0; // Multiply by 2 if using a 1:1 voltage divider
+    
+    // Calculate battery percentage (adjust min/max values based on your battery)
+    // Assuming 3.0V is 0% and 4.2V is 100% for a typical LiPo battery
+    batteryPercentage = constrain((voltage - 3.0) * 100.0 / (4.2 - 3.0), 0.0, 100.0);
+    
+    Serial.printf("Battery: %.2fV (%.1f%%)\n", voltage, batteryPercentage);
 }
 
 void triggerAlarm(bool state) {
@@ -979,8 +994,10 @@ void updateLCD() {
       lcd.setCursor(0, 2);
       lcd.printf("Humidity: %.1f%%", humidity);
       lcd.setCursor(0, 3);
-      lcd.print("Alarm: ");
-      lcd.print(alarmState ? "ON" : "OFF");
+      lcd.print("Batt: ");
+      lcd.print((int)batteryPercentage);
+      lcd.print("% ");
+      lcd.print(alarmState ? "Alarm:ON" : "Alarm:OFF");
       break;
       
     case SHOW_NETWORK:
