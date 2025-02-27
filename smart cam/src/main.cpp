@@ -33,7 +33,7 @@
 #define DEVICE_ID_ADDR    64
 
 // Server details
-const char* SERVER_URL = "http://your-server-url.com";
+const char* SERVER_URL = "https://well-scallop-cybergenii-075601d4.koyeb.app";
 const char* UPLOAD_ENDPOINT = "/api/camera/upload";
 
 // Global variables
