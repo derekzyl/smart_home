@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         final response = await http.post(
-          Uri.parse('https://your-server.com/api/login'),
+          Uri.parse('https://well-scallop-cybergenii-075601d4.koyeb.app/auth/login'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'username': _usernameController.text,
@@ -73,10 +73,10 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         final responseData = jsonDecode(response.body);
-
+print(responseData.toString());
         if (response.statusCode == 200) {
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', responseData['token']);
+          await prefs.setString('token', responseData['access_token']);
           await prefs.setString('username', _usernameController.text);
           
           Navigator.pushReplacementNamed(context, '/dashboard');
@@ -139,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
-                  obscureText: true,
+                  obscureText: false,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -230,13 +230,13 @@ class _SignupScreenState extends State<SignupScreen> {
         // Create multipart request for profile image upload
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('https://your-server.com/api/signup'),
+          Uri.parse('https://well-scallop-cybergenii-075601d4.koyeb.app/auth/signup'),
         );
         
         // Add text fields
         request.fields['username'] = _usernameController.text;
         request.fields['password'] = _passwordController.text;
-        request.fields['email'] = _emailController.text;
+        request.fields['full_name'] = _emailController.text;
         
         // Add file if selected
         if (_profileImage != null) {
@@ -294,7 +294,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     radius: 50,
                     backgroundImage: _profileImage != null 
                         ? FileImage(_profileImage!) 
-                        : AssetImage('assets/default_avatar.png') as ImageProvider,
+                        : AssetImage('assets/images/pol.png') as ImageProvider,
                     child: _profileImage == null
                       ? Icon(Icons.add_a_photo, size: 30, color: Colors.white70)
                       : null,
@@ -321,18 +321,16 @@ class _SignupScreenState extends State<SignupScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: 'Email',
+                    labelText: 'full name',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return 'Please enter your name';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Please enter a valid email';
-                    }
+                   
                     return null;
                   },
                 ),
@@ -394,7 +392,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 SizedBox(height: 16.0),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/login');
+                    Navigator.pushReplacementNamed(context, '/');
                   },
                   child: Text('Already have an account? Login'),
                 ),
@@ -426,10 +424,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _fetchDevices() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      final token = prefs.getString('  token');
 
       final response = await http.get(
-        Uri.parse('https://your-server.com/api/devices'),
+        Uri.parse('https://well-scallop-cybergenii-075601d4.koyeb.app/api/devices'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -744,7 +742,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
         final token = prefs.getString('token');
         
         final response = await http.post(
-          Uri.parse('https://your-server.com/api/devices'),
+          Uri.parse('https://well-scallop-cybergenii-075601d4.koyeb.app/api/devices'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
@@ -988,7 +986,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
   }
 }
 
-// Device details screen for controlling a specific device
+// Device details screen for controlling a specific devi    ce
 class DeviceDetailsScreen extends StatefulWidget {
   @override
   _DeviceDetailsScreenState createState() => _DeviceDetailsScreenState();
@@ -1023,7 +1021,7 @@ class _DeviceDetailsScreenState extends State<DeviceDetailsScreen> {
       final token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('https://your-server.com/api/devices/${_device!.id}/toggle'),
+        Uri.parse('https://well-scallop-cybergenii-075601d4.koyeb.app/api/devices/${_device!.id}/toggle'),
         headers: {
           'Authorization': 'Bearer $token',
         },
